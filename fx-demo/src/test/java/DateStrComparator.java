@@ -1,5 +1,3 @@
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -28,20 +26,35 @@ public class DateStrComparator {
     }
 
     private void innerDealPrefix(String prefix, String startStr, String endStr, List<String> patternStrList) {
-        int prefixLen = prefix.length()
-                , subStart = 0
-                , subEnd = 1
+        // 计算prefix
+        boolean flag = true;
+        String startNextChar, endNextChar;
+        int nextCharIndex = 0;
+        do {
+            try {
+                startNextChar = String.valueOf(startStr.charAt(nextCharIndex));
+                endNextChar = String.valueOf(endStr.charAt(nextCharIndex));
+                flag = (prefix + startNextChar).equals(prefix + endNextChar);
+                if (flag) {
+                    prefix = prefix + startNextChar;
+                    startStr = startStr.substring(1);
+                    endStr = endStr.substring(1);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } while (flag);
+        int
                 // 起始变化数字的第一位
-                , startVariableNumber = Integer.parseInt(startStr.substring(subStart, subEnd))
+                startVariableNumber = Integer.parseInt(String.valueOf(startStr.charAt(0)))
                 // 结束变化数字的第一位
-                , endVariableNumber = Integer.parseInt(endStr.substring(subStart, subEnd))
+                , endVariableNumber = Integer.parseInt(String.valueOf(endStr.charAt(0)))
                 // 变化数字之间的差
                 , variableNumberGap = endVariableNumber - startVariableNumber;
         // 是否是最终的数字
         boolean isLastNumDeal = startStr.length() == 1;
         // 如果变化数字之间的差仅仅为1，那么表示只需要prefix和suffix
         // 如果变化数字之间的差大于1，那么表示需要prefix,suffix和中间部分
-        StringBuffer prefixBuffer = new StringBuffer(prefix).append(startVariableNumber);
         if (isLastNumDeal) {
             if (variableNumberGap == 0) {
                 // 相等
@@ -50,27 +63,17 @@ public class DateStrComparator {
                 patternStrList.add("(" + prefix+"["+startVariableNumber+"-"+endVariableNumber + "])");
             }
         }else {
-            int startFirstNum = Integer.parseInt(startStr.substring(0, 1))
-                    , endFirstNum = Integer.parseInt(endStr.substring(0, 1))
-                    , padLen = startStr.length() - 1;
-            int startIndex = 1;
-            String padStr = "";
-            // 下一个串如果是-
-            if (startStr.length() > 1 && "-".equals(startStr.substring(1, 2))) {
-                startIndex ++;
-                padLen--;
-                padStr = "-";
-            }
+          int startIndex = 1;
             String startStrSub = startStr.substring(startIndex);
             String endStrSub = endStr.substring(startIndex);
             // 最少的部分
-            innerDealPrefix(prefix+startFirstNum+padStr, startStrSub, replaceAllNumber(startStrSub, "9"), patternStrList);
+            innerDealPrefix(prefix+startVariableNumber, startStrSub, replaceAllNumber(startStrSub, "9"), patternStrList);
             // 最多的部分
-            innerDealPrefix(prefix+endFirstNum+padStr, replaceAllNumber(endStrSub, "0"), endStrSub, patternStrList);
+            innerDealPrefix(prefix+endVariableNumber, replaceAllNumber(endStrSub, "0"), endStrSub, patternStrList);
             // 中间的部分
             if (variableNumberGap > 1) {
                 // 将所有的字符串替换为\\d
-                String addPatternStr = "(" + prefix + "[" + (startVariableNumber + 1) + "-" + (endVariableNumber - 1) + "]"+padStr + replaceAllNumber(startStrSub, "\\\\d") + ")";
+                String addPatternStr = "(" + prefix + "[" + (startVariableNumber + 1) + "-" + (endVariableNumber - 1) + "]" + replaceAllNumber(startStrSub, "\\\\d") + ")";
                 patternStrList.add(addPatternStr);
             }
         }
@@ -85,6 +88,9 @@ public class DateStrComparator {
                 return "9-31";
             }
             return substring;
+            // 取最大值时，仅在
+        } else if ("0".equals(replaceChar) && string.length() == 6) {
+            return "-01-01";
         }
         return Pattern.compile("\\d").matcher(string).replaceAll(replaceChar);
     }

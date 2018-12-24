@@ -62,31 +62,29 @@ public class DatePatternTest {
     }
 
     @Test
-    public void numberCompare() {
-        String start = "1845-06-04";
-        String end = "1966-10-25";
-        System.out.println("start: "+start);
-        System.out.println("end: "+end);
+    public void numberCompare() throws ParseException {
+        String start = "1845-05-04";
+        String end = "1845-06-14";
+
+        System.out.println("开始时间: "+start);
+        System.out.println("结束时间: "+end);
         DateStrComparator comparator = new DateStrComparator(start, end);
         String patternStr = comparator.dealWith();
-        System.out.println("结果: "+patternStr);
+        System.out.println("用于匹配的正则: "+patternStr);
         Pattern pattern = Pattern.compile(patternStr);
-        long oneDays = TimeUnit.DAYS.toMillis(1);
+
+        // 时间格式化
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            Date startDate = dateFormat.parse(start);
-            Date endDate = dateFormat.parse(end);
-            long startDateMillis = startDate.getTime();
-            long endDateMillis = endDate.getTime();
-            for (long i = startDateMillis; i <= endDateMillis; i += oneDays) {
-                Date tempDate = new Date(i);
-                String format = dateFormat.format(tempDate);
-                if (!pattern.matcher(format).find()) {
-                    System.out.println(format+" -> 不合法");
-                }
+        // 一天步长
+        long oneDays = TimeUnit.DAYS.toMillis(1);
+        Date startDate = dateFormat.parse("1845-04-04");
+        Date endDate = dateFormat.parse("1845-06-25");
+        for (long i = startDate.getTime(); i <= endDate.getTime(); i += oneDays) {
+            Date tempDate = new Date(i);
+            String format = dateFormat.format(tempDate);
+            if (!pattern.matcher(format).find()) {
+                System.out.println(format+" -> 不合法");
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
 
     }
