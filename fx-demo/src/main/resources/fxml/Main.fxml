@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import top.jafar.javafx.demo.demo01.model.Person?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="top.jafar.javafx.demo.demo01.controller.MainController">
+   <children>
+      <Label layoutX="27.0" layoutY="26.0" text="Address Book">
+         <font>
+            <Font name="Consolas" size="25.0" />
+         </font>
+      </Label>
+      <TableView fx:id="table" editable="true" layoutX="46.0" layoutY="82.0" prefHeight="186.0" prefWidth="514.0">
+        <columns>
+          <TableColumn prefWidth="131.0" text="First Name">
+              <cellValueFactory><PropertyValueFactory property="firstName" /></cellValueFactory>
+          </TableColumn>
+          <TableColumn prefWidth="131.0" text="Last Name">
+              <cellValueFactory><PropertyValueFactory property="lastName" /></cellValueFactory>
+          </TableColumn>
+          <TableColumn prefWidth="251.0" text="Email Address">
+              <cellValueFactory><PropertyValueFactory property="email" /></cellValueFactory>
+          </TableColumn>
+        </columns>
+          <items>
+              <FXCollections fx:factory="observableArrayList">
+                <Person email="jacob.smith@example.com" firstName="Jacob" lastName="Smith" />
+              </FXCollections>
+          </items>
+          <sortOrder>
+          </sortOrder>
+      </TableView>
+      <TextField fx:id="inputFirstName" layoutX="46.0" layoutY="297.0" prefHeight="23.0" prefWidth="109.0" promptText="First Name" />
+      <TextField fx:id="inputLastName" layoutX="175.0" layoutY="297.0" prefHeight="23.0" prefWidth="119.0" promptText="Last Name" />
+      <TextField fx:id="inputEmail" layoutX="313.0" layoutY="297.0" promptText="Email" />
+      <Button fx:id="btnAdd" layoutX="495.0" layoutY="297.0" mnemonicParsing="false" text="Add" />
+   </children>
+</AnchorPane>
