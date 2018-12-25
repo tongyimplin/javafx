@@ -17,6 +17,7 @@
     <modules>
         <module>fx-demo</module>
         <module>fx-oracle-transfer</module>
+        <module>basic</module>
     </modules>
     <packaging>pom</packaging>
 

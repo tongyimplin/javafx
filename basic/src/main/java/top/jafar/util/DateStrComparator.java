@@ -1,13 +1,27 @@
+package top.jafar.util;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * 根据日期时间生成正则匹配
+ * top.jafar.util.DateStrComparator comparator = new top.jafar.util.DateStrComparator("1998-01-06", "2012-04-06");
+ * String dateRangeRegexp = comparator.dealWith();
+ * Pattern pattern = Pattern.compile(dateRangeRegexp);
+ * boolean isValid = pattern.matcher("2013-04-06").find();
+ *
+ * 或者
+ * top.jafar.util.DateStrComparator comparator = new top.jafar.util.DateStrComparator("1998-01-06", "2012-04-06");
+ * boolean isValid = comparator.isValid("2013-04-06");
+ */
 public class DateStrComparator {
     private int strLength;
     private int diffIndex;
     private int diffCount;
     private String start;
     private String end;
+    private String dateRangeReg;
 
     public DateStrComparator(String start, String end) {
         this.start = start;
@@ -17,12 +31,25 @@ public class DateStrComparator {
         this.diffCount = this.strLength - this.diffIndex;
     }
 
+    /**
+     * 校验日期是否合法
+     * @param dateStr
+     * @return
+     */
+    public boolean isValid(String dateStr) {
+        if (dateRangeReg == null) {
+            dateRangeReg = dealWith();
+        }
+        return Pattern.compile(dateRangeReg).matcher(dateStr).find();
+    }
+
     public String dealWith() {
         System.out.println("diffCount: "+diffCount);
         int numberLen = start.length();
         List<String> patternString = new ArrayList<>();
         innerDealPrefix(start.substring(0, diffIndex), start.substring(diffIndex, numberLen), end.substring(diffIndex, numberLen), patternString);
-        return String.join("|", patternString);
+        dateRangeReg = String.join("|", patternString);
+        return dateRangeReg;
     }
 
     private void innerDealPrefix(String prefix, String startStr, String endStr, List<String> patternStrList) {
