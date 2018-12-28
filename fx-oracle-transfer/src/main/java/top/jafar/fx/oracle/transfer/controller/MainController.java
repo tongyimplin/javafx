@@ -10,6 +10,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
 import top.jafar.fx.oracle.transfer.model.DataSourceModel;
 import top.jafar.fx.oracle.transfer.util.Constants;
+import top.jafar.fx.oracle.transfer.util.FileHelper;
 import top.jafar.fx.oracle.transfer.util.TransferHelper;
 
 import java.io.IOException;
@@ -76,22 +77,47 @@ public class MainController extends AbsController {
         }
         TransferHelper sourceHelper = new TransferHelper(sourceModel);
         TransferHelper targetHelper = new TransferHelper(targetModel);
-        try {
+        try(FileHelper sqlLogHelper = FileHelper.getWritableFile("sql-log");) {
+            println("SQL日志文件: "+sqlLogHelper.getLogPath());
             List<String> allTables = sourceHelper.listAllTables();
             int allTableSize = allTables.size();
             println("查询到共计"+allTableSize+"张表, "+allTables);
             // 获取建表语句
-            allTables.forEach(name -> {
+            /*allTables.forEach(name -> {
                 try {
-                    println("获取建表SQL： "+name);
-                    String createTableSQL = sourceHelper.fetchCreateTableSQL(name);
-                    println(createTableSQL);
+//                    println("获取建表SQL： "+name);
+//                    String createTableSQL = sourceHelper.fetchCreateTableSQL(name);
+//                    println(createTableSQL);
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });*/
+            // 获取序列
+            List<String> sequences = sourceHelper.listAllSequences();
+            println("查询到共计"+sequences.size()+"条序列, "+sequences);
+            // 获取sequence值
+            sequences.stream().forEach(sequenceName -> {
+                try {
+                    int curVal = sourceHelper.fetchSequenceValue(sequenceName);
+                    // 生产对应的创建SQL
+                    String seqDDL = String.format("create sequence %s increment by 1 start with %d;", sequenceName, curVal).toUpperCase();
+                    // 插入序列
+                    if (targetHelper.existSequence(sequenceName)) {
+                        // 如果存在则删除sequence
+                        String seqDropDDL = String.format("drop sequence %s", sequenceName).toUpperCase();
+                        sqlLogHelper.append(seqDropDDL+";");
+                        targetHelper.execSequence(seqDropDDL);
+                    }
+                    sqlLogHelper.append(seqDDL+";");
                 } catch (SQLException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             });
+
         } catch (Exception e) {
             e.printStackTrace();
             println(e.getMessage());

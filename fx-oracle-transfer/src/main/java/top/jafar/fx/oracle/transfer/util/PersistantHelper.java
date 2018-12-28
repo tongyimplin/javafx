@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PersistantHelper {
 
-    static File CONFIG_FILE = new File(System.getProperty("user.home") + "/fx-oracle-transfer/config.conf");
+    static File CONFIG_FILE = FileHelper.getFile("config.conf");
 
     public static List<DataSourceModel> loadDatasource() {
         if (!CONFIG_FILE.exists()) {

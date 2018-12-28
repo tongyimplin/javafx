@@ -9,7 +9,7 @@
 
 <AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="top.jafar.fx.oracle.transfer.controller.MainController">
    <children>
-      <Label layoutX="339.0" layoutY="14.0" prefHeight="27.0" prefWidth="166.0" text="ORACLE数据迁移" textAlignment="CENTER">
+      <Label layoutX="288.0" layoutY="14.0" prefHeight="27.0" prefWidth="166.0" text="ORACLE序列迁移" textAlignment="CENTER">
          <font>
             <Font name="Microsoft YaHei" size="20.0" />
          </font>

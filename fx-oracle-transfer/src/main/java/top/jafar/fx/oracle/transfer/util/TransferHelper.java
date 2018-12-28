@@ -82,7 +82,76 @@ public class TransferHelper {
         }
         return null;
     }
+
     // 获取序列列表
-    // 获取表数据
-    // 插入表数据
+    public List<String> listAllSequences() throws SQLException, ClassNotFoundException {
+        String sql = "select SEQUENCE_NAME from dba_sequences where sequence_owner='"+dataSource.getUsername().toUpperCase()+"'";
+        System.out.println("SQL: "+sql);
+        Connection conn = getConnection();
+        List<String> list = new ArrayList<>();
+        try (
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet resultSet = pstmt.executeQuery()
+        ) {
+            while (resultSet.next()) {
+                String sequenceName = resultSet.getString("SEQUENCE_NAME");
+                list.add(sequenceName);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // 获取当前序列的值
+    public int fetchSequenceValue(String sequenceName) throws SQLException, ClassNotFoundException {
+        String sql = "select " + sequenceName + ".nextval as val from dual";
+        System.out.println("SQL: "+sql);
+        Connection conn = getConnection();
+        int val = 1;
+        try (
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet resultSet = pstmt.executeQuery()
+        ) {
+            if (resultSet.next()) {
+                val = resultSet.getInt("val");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return val;
+    }
+
+    // 检测序列是否存在
+    public boolean existSequence(String sequenceName) throws SQLException, ClassNotFoundException {
+        String sql = String.format("select count(*) as c from dba_sequences where SEQUENCE_OWNER='%s' and sequence_name='%s'"
+                , dataSource.getUsername().toUpperCase(), sequenceName.toUpperCase());
+        System.out.println("SQL: "+sql);
+        Connection conn = getConnection();
+        boolean b = false;
+        try (
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet resultSet = pstmt.executeQuery()
+        ) {
+            if (resultSet.next()) {
+                b = resultSet.getInt("c") == 1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return b;
+    }
+    // 插入序列
+    public boolean execSequence(String sql) throws SQLException, ClassNotFoundException {
+        System.out.println("SQL: "+sql);
+        Connection conn = getConnection();
+        try (
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            return pstmt.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
